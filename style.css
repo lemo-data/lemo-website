@@ -1,0 +1,14 @@
+body { font-family: 'Montserrat', sans-serif; margin: 0; }
+#mainNav { background: rgba(15,15,35,0.95); transition: all 0.3s; padding: 1rem 0; }
+#mainNav.navbar-shrink { padding: 0.5rem 0; background: rgba(15,15,35,1); }
+.masthead { position: relative; height: 100vh; background: #0f0f23; display: flex; align-items: center; justify-content: center; }
+#particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; }
+.textlanding { z-index: 2; }
+.btn-success { background: #69b3a2; border: none; }
+.btn-success:hover { background: #5aa293; }
+.slider { overflow: hidden; padding: 40px 0; background: white; }
+.slide-track { display: flex; animation: scroll 20s linear infinite; width: calc(200px * 12); }
+.slide { height: 100px; width: 200px; display: flex; align-items: center; justify-content: center; }
+.slide img { max-height: 70px; filter: grayscale(100%); transition: 0.3s; }
+.slide img:hover { filter: grayscale(0%); transform: scale(1.1); }
+@keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-200px * 6)); } }
