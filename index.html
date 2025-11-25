@@ -520,6 +520,7 @@
           localStorage.setItem('lang', currentLang);
         })
         .catch(() => {
+          currentLang = 'pt-BR';
           applyLanguage();
           localStorage.setItem('lang', currentLang);
         });
