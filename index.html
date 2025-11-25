@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n="title">Leandro Moreno | Senior Bioinformatician</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>L</text></svg>">
+  
+  <style>
+    .wave { font-size: 1.1em; margin-left: 0.5rem; vertical-align: middle; display: inline-block; }
+    :root { --primary: #42f5e6; --dark: #0f1c2e; --light: #f8f9fa; }
+    body { font-family: 'Montserrat', sans-serif; background: linear-gradient(to bottom, #0f1c2e, #112233); color: #ddd; line-height: 1.7; overflow-x: hidden; }
+    h1, h2, h3 { font-weight: 700; color: white; }
+    a { color: var(--primary); transition: all 0.3s; }
+    a:hover { color: #8fffe0; text-decoration: none; }
+
+    /* Navbar */
+    #mainNav { background: rgba(15, 28, 46, 0.95); backdrop-filter: blur(10px); padding: 1rem 0; transition: all 0.4s; border-bottom: 1px solid rgba(66, 245, 230, 0.1); }
+    #mainNav.navbar-shrink { padding: 0.5rem 0; background: rgba(15, 28, 46, 0.98); }
+    .navbar-brand { font-weight: 700; font-size: 1.35rem; color: white !important; letter-spacing: 0.5px; }
+    .navbar-brand:hover { color: var(--primary) !important; }
+    .nav-link { color: white !important; font-weight: 500; font-size: 0.95rem; }
+    .nav-link:hover { color: var(--primary) !important; }
+
+    .leaflet-container {
+      background: #0f1c2e !important;
+    }
+    .leaflet-pane img { 
+      image-rendering: pixelated;
+    }
+
+    /* Locale Selector */
+    .locale-selector { position: relative; }
+    .locale-trigger { display: flex; align-items: center; background: transparent; border: 0; color: #c9d1d9; font-size: 14px; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+    .locale-trigger:hover { color: white; background: rgba(255,255,255,0.08); }
+    .locale-trigger svg { fill: currentColor; width: 16px; height: 16px; }
+    .locale-icon { margin-right: 6px; }
+    .locale-chevron { margin-left: 4px; transition: transform 0.2s; }
+    .locale-trigger[aria-expanded="true"] .locale-chevron { transform: rotate(180deg); }
+    .locale-menu { position: absolute; top: 100%; right: 0; margin-top: 8px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; width: 220px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); overflow: hidden; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s ease; }
+    .locale-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+    .locale-item { padding: 10px 16px; display: flex; align-items: center; color: #c9d1d9; font-size: 14px; cursor: pointer; transition: background 0.2s; }
+    .locale-item:hover { background: #21262d; }
+    .locale-item.active { color: white; font-weight: 600; background: #1f6feb1a; }
+    .locale-item .check { width: 20px; text-align: center; margin-right: 10px; opacity: 0; color: var(--primary); }
+    .locale-item.active .check { opacity: 1; }
+
+    /* Header */
+    .masthead { position: relative; height: 100vh; min-height: 600px; display: flex; align-items: center; overflow: hidden; }
+    #particles-js { position: absolute; width: 100%; height: 100%; top: 0; left: 0; z-index: 1; }
+    .textlanding { position: relative; z-index: 2; text-align: center; }
+    .textlanding h1 { font-size: 3.4rem; font-weight: 700; color: white; margin-bottom: 1rem; }
+    .btn-getintouch { padding: 0.7rem 2rem; font-size: 1rem; border-radius: 50px; background: transparent; border: 2px solid var(--primary); color: var(--primary); font-weight: 600; transition: all 0.3s; }
+    .btn-getintouch:hover { background: var(--primary); color: #0f1c2e; transform: translateY(-3px); }
+
+    /* Social Icons */
+    .social-icons { margin-top: 2.5rem; display: flex; justify-content: center; gap: 1.4rem; }
+    .social-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.08); border-radius: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.4s; border: 1px solid rgba(66,245,230,0.2); }
+    .social-icon:hover { background: rgba(66,245,230,0.3); transform: translateY(-8px); box-shadow: 0 12px 30px rgba(66,245,230,0.3); }
+    .social-icon i { font-size: 1.7rem; color: #42f5e6; }
+
+    /* About */
+    #about img { width: 195px; height: 195px; object-fit: cover; border-radius: 50%; box-shadow: 0 0 60px rgba(66,245,230,0.55); transition: all 0.4s; }
+    #about img:hover { box-shadow: 0 0 80px rgba(66,245,230,0.8); transform: scale(1.06); }
+
+    /* Sections */
+    section { padding: 110px 0; position: relative; }
+    .bg-dark-section { background: linear-gradient(to bottom, #0f1c2e, #112233); }
+    .bg-light-section { background: #162b40; border-top: 1px solid rgba(66,245,230,0.2); }
+
+    /* Previous Work */
+    #previous-work { background: #162b40; padding: 100px 0; position: relative; overflow: hidden; }
+    #previous-work::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 230px; background: rgba(255,255,255,0.13); border-radius: 32px; backdrop-filter: blur(16px); border-top: 1px solid rgba(66,245,230,0.3); border-bottom: 1px solid rgba(66,245,230,0.3); z-index: 1; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+    .slider { position: relative; z-index: 2; padding: 45px 0; }
+    .slide-track { display: flex; width: calc(340px * 14); animation: scroll 40s linear infinite; }
+    .slide { height: 170px; width: 340px; display: flex; align-items: center; justify-content: center; margin: 0 25px; }
+    .slide img { max-height: 135px; max-width: 300px; height: auto; width: auto; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); transition: all 0.5s; }
+    .slide img.small { max-height: 110px; max-width: 220px; }
+    .slide:hover img { filter: drop-shadow(0 15px 35px rgba(66,245,230,0.7)); transform: scale(1.15); }
+    @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-340px * 7)); } }
+
+    /* Services */
+    #services { padding: 120px 0; }
+    .service-card { background: rgba(22, 43, 64, 0.85); border-radius: 20px; padding: 2.5rem 2rem; text-align: center; transition: all 0.4s; border: 1px solid rgba(66,245,230,0.2); height: 100%; }
+    .service-card:hover { transform: translateY(-12px); border-color: var(--primary); box-shadow: 0 25px 60px rgba(66,245,230,0.25); }
+    .service-icon { font-size: 3rem; color: var(--primary); margin-bottom: 1.5rem; }
+    .service-title { font-weight: 700; color: white; margin-bottom: 1rem; }
+    .service-desc { font-size: 0.95rem; color: #ccc; }
+
+    /* Experience Collapse */
+    .collapse-btn { background: transparent; border: 2px solid var(--primary); color: var(--primary); padding: 0.6rem 1.8rem; border-radius: 50px; font-weight: 600; transition: all 0.3s; }
+    .collapse-btn:hover { background: var(--primary); color: #0f1c2e; }
+
+    /* Timeline */
+    .timeline-modern { position: relative; max-width: 1000px; margin: 0 auto; padding: 60px 0; }
+    .timeline-modern::before { content: ''; position: absolute; width: 4px; background: linear-gradient(to bottom, transparent, var(--primary), transparent); top: 0; bottom: 0; left: 50%; margin-left: -2px; border-radius: 2px; box-shadow: 0 0 20px rgba(66, 245, 230, 0.3); }
+    .timeline-item { position: relative; margin: 100px 0; clear: both; }
+    .timeline-item:first-child { margin-top: 0; }
+    .timeline-item:last-child { margin-bottom: 250px !important; }
+    .timeline-dot { position: absolute; width: 20px; height: 20px; background: var(--primary); border: 5px solid #0f1c2e; border-radius: 50%; top: 25px; left: 50%; margin-left: -10px; z-index: 2; box-shadow: 0 0 0 8px rgba(66, 245, 230, 0.25), 0 0 30px rgba(66, 245, 230, 0.4); transition: all 0.3s; }
+    .timeline-item:hover .timeline-dot { transform: scale(1.4); box-shadow: 0 0 0 12px rgba(66, 245, 230, 0.4), 0 0 40px rgba(66, 245, 230, 0.6); }
+    .timeline-content { width: 45%; padding: 0 30px; }
+    .timeline-content.left { float: left; text-align: right; }
+    .timeline-content.right { float: right; text-align: left; }
+    .timeline-card { background: rgba(22, 43, 64, 0.85); padding: 32px 28px; border-radius: 20px; backdrop-filter: blur(14px); border: 1px solid rgba(66, 245, 230, 0.2); box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5); transition: all 0.4s ease; position: relative; min-height: 280px; display: flex; flex-direction: column; justify-content: space-between; }
+    .timeline-card ul { flex-grow: 1; margin-top: 16px; padding-left: 0; }
+    .timeline-card::before { content: ''; position: absolute; top: 28px; width: 0; height: 0; border: 12px solid transparent; }
+    .left .timeline-card::before { right: -24px; border-left-color: rgba(66, 245, 230, 0.2); }
+    .right .timeline-card::before { left: -24px; border-right-color: rgba(66, 245, 230, 0.2); }
+    .timeline-card:hover { transform: translateY(-12px); border-color: var(--primary); box-shadow: 0 25px 60px rgba(66, 245, 230, 0.25); background: rgba(22, 43, 64, 0.95); }
+    .timeline-card h5 { color: var(--primary); font-weight: 700; font-size: 1.15rem; margin-bottom: 8px; }
+    .timeline-card h5 span { color: #aaa; font-weight: 500; font-size: 0.95rem; }
+    .timeline-card h6 { color: #42f5e6; font-size: 0.9rem; margin-bottom: 16px; font-weight: 600; }
+    .timeline-card ul { list-style: none; padding: 0; margin: 0; }
+    .timeline-card li { position: relative; padding-left: 26px; margin-bottom: 10px; font-size: 0.95rem; line-height: 1.5; color: #ddd; }
+    .timeline-card li::before { content: '>'; position: absolute; left: 0; color: var(--primary); font-weight: bold; }
+
+    /* Publication Cards - NEW */
+    .pub-card {
+      transition: all 0.35s ease;
+      border: 1px solid transparent;
+      cursor: pointer;
+    }
+    .pub-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--primary);
+      box-shadow: 0 20px 50px rgba(66, 245, 230, 0.3);
+      background: rgba(22, 43, 64, 0.95) !important;
+    }
+
+    /* Map */
+    #map { height: 520px; border-radius: 24px; box-shadow: 0 25px 70px rgba(0,0,0,0.7); border: 4px solid rgba(66,245,230,0.4); }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .textlanding h1 { font-size: 2.6rem; }
+      .navbar-brand { font-size: 1.2rem; }
+      #about img { width: 165px; height: 165px; }
+      #previous-work::before { height: 180px; width: 96%; }
+      .slide-track { width: calc(240px * 14); }
+      .slide { width: 240px; height: 130px; margin: 0 15px; }
+      .slide img { max-height: 100px; }
+      .slide img.small { max-height: 95px; max-width: 180px; }
+      @keyframes scroll { 100% { transform: translateX(calc(-240px * 7)); } }
+      .timeline-modern::before { left: 10px; }
+      .timeline-dot { left: 10px; margin-left: 0; }
+      .timeline-content { width: 100%; padding: 0 0 0 50px; float: none !important; text-align: left !important; }
+      .timeline-card { margin-left: 20px; min-height: 240px; }
+      .timeline-card::before { display: none; }
+      .timeline-item { margin: 80px 0; }
+      .service-card { margin-bottom: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand" href="#">leandro MORENO - </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item"><a class="nav-link" href="#about" data-i18n="nav_about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services" data-i18n="nav_services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="#experience" data-i18n="nav_experience">Experience</a></li>
+          <li class="nav-item"><a class="nav-link" href="#pubs" data-i18n="nav_pubs">Publications</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact" data-i18n="nav_contact">Contact</a></li>
+        </ul>
+        <div class="locale-selector">
+          <button class="locale-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="locale-menu">
+            <svg class="locale-icon octicon octicon-globe" viewBox="0 0 16 16" aria-hidden="true">
+              <path fill="currentColor" d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM5.78 8.75a9.64 9.64 0 0 0 1.363 4.177c.255.426.542.832.857 1.215.245-.296.551-.705.857-1.215A9.64 9.64 0 0 0 10.22 8.75Zm4.44-1.5a9.64 9.64 0 0 0-1.363-4.177c-.307-.51-.612-.919-.857-1.215a9.927 9.927 0 0 0-.857 1.215A9.64 9.64 0 0 0 5.78 7.25Zm-5.944 1.5H1.543a6.507 6.507 0 0 0 4.666 5.5c-.123-.181-.24-.365-.352-.552-.715-1.192-1.437-2.874-1.581-4.948Zm-2.733-1.5h2.733c.144-2.074.866-3.756 1.58-4.948.12-.197.237-.381.353-.552a6.507 6.507 0 0 0-4.666 5.5Zm10.181 1.5c-.144 2.074-.866 3.756-1.58 4.948-.12.197-.237.381-.353.552a6.507 6.507 0 0 0 4.666-5.5Zm2.733-1.5a6.507 6.507 0 0 0-4.666-5.5c.123.181.24.365.353.552.714 1.192 1.436 2.874 1.58 4.948Z"></path>
+            </svg>
+            <span class="current-locale">English</span>
+            <svg class="locale-chevron octicon octicon-chevron-down" viewBox="0 0 16 16" aria-hidden="true">
+              <path fill="currentColor" d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"></path>
+            </svg>
+          </button>
+          <div class="locale-menu" id="locale-menu">
+            <div class="locale-item active" data-lang="en"><div class="check"><svg height="16" viewBox="0 0 16 16" width="16"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg></div><span>English</span></div>
+            <div class="locale-item" data-lang="pt-BR"><div class="check"></div><span>Português (Brasil)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="masthead">
+    <div id="particles-js"></div>
+    <div class="textlanding container">
+      <h1 data-i18n="header_h1">LEMŌ Data Science</h1>
+      <p class="lead" data-i18n="header_p1">"LEarning and MOdeling"</p>
+      <p class="lead" data-i18n="header_p2">Translational Data Science | Bioinformatics | Data Storytelling</p>
+      <a href="#contact" class="btn btn-getintouch mt-3" data-i18n="btn_getintouch">Get in touch</a>
+      <div class="social-icons">
+        <a href="https://github.com/lemo-data" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+        <a href="https://www.linkedin.com/in/leandro-moreno-phd-16071734/" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
+        <a href="https://scholar.google.com/citations?user=lCqiKH0AAAAJ&hl=en" target="_blank" class="social-icon"><i class="fa-brands fa-google-scholar"></i></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- About -->
+  <section id="about" class="bg-dark-section">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-4 text-center mb-5 mb-lg-0">
+          <img src="img/foto.jpeg" class="img-fluid" alt="Leandro Moreno">
+        </div>
+        <div class="col-lg-8">
+          <h2 class="mb-4" data-i18n="about_h2">About me</h2>
+          <p data-i18n-html="about_p">Hi, I'm Leandro <span class="wave" role="img" aria-label="hand waving">hand waving</span> I am specialized in applying <b>advanced bioinformatics</b> and data visualization techniques to analyze <b>multi omics datasets</b>. I transform complex biological data into clear, insightful patterns and interactive visualizations that help companies and researchers communicate their results effectively.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="bg-dark-section">
+    <div class="container">
+      <h2 class="text-center mb-5" data-i18n="services_h2">Services</h2>
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="fas fa-dna"></i></div>
+            <h4 class="service-title" data-i18n="service_analysis_title">Custom Bioinformatics Analysis</h4>
+            <p class="service-desc" data-i18n="service_analysis_desc">
+              Any sequencing-based project: bulk RNA-seq, scRNA-seq/atac-seq, metagenomics (16S & shotgun), WGS/WES, bisulfite-seq, ChIP-seq, long-read (PacBio/Nanopore), spatial transcriptomics, etc.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="fas fa-project-diagram"></i></div>
+            <h4 class="service-title" data-i18n="service_integration_title">Multi-omics Integration & Data Storytelling</h4>
+            <p class="service-desc" data-i18n="service_integration_desc">
+              Combining transcriptomics, proteomics, genomics, epigenomics and clinical data into clear biological insights and publication-ready figures.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-4 mb-4">
+          <div class="service-card">
+            <div class="service-icon"><i class="fas fa-desktop"></i></div>
+            <h4 class="service-title" data-i18n="service_consultancy_title">Scientific Consultancy & Interactive Tools</h4>
+            <p class="service-desc" data-i18n="service_consultancy_desc">
+              Project design, pipeline development, team training, GCP-compliant R Shiny dashboards and reproducible reports for pharma, biotech and academia.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Previous Work -->
+  <section id="previous-work">
+    <div class="slider">
+      <div class="slide-track">
+        <div class="slide"><img src="img/logo_genmab.svg" alt="Genmab"></div>
+        <div class="slide"><img src="img/logo_AMC.svg" alt="AMC" class="small"></div>
+        <div class="slide"><img src="img/logo_cbs.png" alt="CBS" class="small"></div>
+        <div class="slide"><img src="img/logo_ufpr.svg" alt="UFPR"></div>
+        <div class="slide"><img src="img/logo.uva.svg" alt="UVA"></div>
+        <div class="slide"><img src="img/logo_genmab.svg" alt="Genmab"></div>
+        <div class="slide"><img src="img/logo_AMC.svg" alt="AMC" class="small"></div>
+        <div class="slide"><img src="img/logo_cbs.png" alt="CBS" class="small"></div>
+        <div class="slide"><img src="img/logo_ufpr.svg" alt="UFPR"></div>
+        <div class="slide"><img src="img/logo.uva.svg" alt="UVA"></div>
+        <div class="slide"><img src="img/logo_genmab.svg" alt="Genmab"></div>
+        <div class="slide"><img src="img/logo_AMC.svg" alt="AMC" class="small"></div>
+        <div class="slide"><img src="img/logo_cbs.png" alt="CBS" class="small"></div>
+        <div class="slide"><img src="img/logo_ufpr.svg" alt="UFPR"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section id="experience" class="bg-dark-section">
+    <div class="container">
+      <h2 class="text-center mb-4" data-i18n="experience_h2">Professional Experience</h2>
+      <div class="text-center mb-5">
+        <button class="collapse-btn" data-toggle="collapse" data-target="#timeline-container" data-i18n="btn_show_more">Show more</button>
+      </div>
+      <div class="collapse" id="timeline-container">
+        <div class="timeline-modern">
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content right">
+              <div class="timeline-card">
+                <h5 data-i18n-html="exp_genmab_title">Senior Data Scientist <span>@ Genmab</span></h5>
+                <h6 data-i18n="exp_genmab_date">Apr 2023 – Jul 2025 • Utrecht, NL</h6>
+                <ul>
+                  <li data-i18n="exp_genmab_1">Lead scRNA-seq & bulk RNA-seq for drug development</li>
+                  <li data-i18n="exp_genmab_2">Multi-omics integration (TCGA, CPTAC, TEMPUS)</li>
+                  <li data-i18n="exp_genmab_3">R Shiny dashboards (GCP compliant)</li>
+                  <li data-i18n="exp_genmab_4">Mentored junior bioinformaticians</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content left">
+              <div class="timeline-card">
+                <h5 data-i18n-html="exp_amc_title">Postdoc <span>@ Amsterdam UMC</span></h5>
+                <h6 data-i18n="exp_amc_date">Nov 2018 – Mar 2023 • Amsterdam, NL</h6>
+                <ul>
+                  <li data-i18n="exp_amc_1">scRNA-seq + GRO-seq in colorectal cancer</li>
+                  <li data-i18n="exp_amc_2">Deep learning for RNA-seq deconvolution</li>
+                  <li data-i18n="exp_amc_3">ML classification of metastatic subtypes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content right">
+              <div class="timeline-card">
+                <h5 data-i18n-html="exp_uva_title">PhD <span>@ UvA / Westerdijk Institute</span></h5>
+                <h6 data-i18n="exp_uva_date">Oct 2013 – Nov 2018 • Amsterdam, NL</h6>
+                <ul>
+                  <li data-i18n="exp_uva_1">33 fungal genomes (PacBio + Illumina)</li>
+                  <li data-i18n="exp_uva_2">Comparative transcriptomics of pathogens</li>
+                  <li data-i18n="exp_uva_3">Data mining for virulence biomarkers</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content left">
+              <div class="timeline-card">
+                <h5 data-i18n-html="exp_ufpr_title">MSc Biochemistry <span>@ UFPR</span></h5>
+                <h6 data-i18n="exp_ufpr_date">2011 – 2013 • Curitiba, BR</h6>
+                <ul>
+                  <li data-i18n="exp_ufpr_1">Pipeline for novel microRNA discovery</li>
+                  <li data-i18n="exp_ufpr_2">De novo transcriptome assembly</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Publications - NOW WITH REAL CLICKABLE LINKS -->
+  <section id="pubs" class="bg-dark-section">
+    <div class="container">
+      <h2 class="text-center mb-5" data-i18n="pubs_h2">Selected Publications</h2>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <a href="https://pubmed.ncbi.nlm.nih.gov/39562049/" target="_blank" class="text-decoration-none">
+            <div class="p-4 bg-light-section rounded pub-card" data-i18n-html="pub_gut">
+              <strong>Gut 2025</strong><br><em>Schwarzmuller I.J., et al.</em>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 mb-4">
+          <a href="https://www.nature.com/articles/s41586-021-03558-4" target="_blank" class="text-decoration-none">
+            <div class="p-4 bg-light-section rounded pub-card" data-i18n-html="pub_nature">
+              <strong>Nature 2021</strong><br><em>van Neerven S.M., et al.</em>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 mb-4">
+          <a href="https://pubmed.ncbi.nlm.nih.gov/38670098/" target="_blank" class="text-decoration-none">
+            <div class="p-4 bg-light-section rounded pub-card" data-i18n-html="pub_cell">
+              <strong>Cell Reports Medicine 2024</strong><br><em>Bootsma S., et al.</em>
+            </div>
+          </a>
+        </div>
+        <div class="col-md-6 mb-4">
+          <a href="https://www.nature.com/articles/s41467-022-32198-z" target="_blank" class="text-decoration-none">
+            <div class="p-4 bg-light-section rounded pub-card" data-i18n-html="pub_natcomm">
+              <strong>Nature Communications 2022</strong><br><em>Lenos K.J., et al.</em>
+            </div>
+          </a>
+        </div>
+      </div>
+      <p class="text-center mt-5">
+        <a href="https://pubmed.ncbi.nlm.nih.gov/?term=Moreno+LF&cauthor=true" target="_blank" class="btn btn-outline-light btn-lg" data-i18n="btn_pubmed">Full list on PubMed</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- Map -->
+  <section class="bg-dark-section">
+    <div class="container">
+      <h2 class="text-center mb-5" data-i18n="based_in_h2" style="color: white;">Based in</h2>
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="bg-light-section">
+    <div class="container text-center">
+      <h2 data-i18n="contact_h2">Contact</h2>
+      <p class="lead mb-4">
+        lemo@lemo-data.nl / leandro@ufpr.br<br>
+        +55 11 960651469 / +31 6 81013726<br>
+        Bloemstraat 24-1, 1016 LB, Amsterdam
+      </p>
+      <a href="mailto:l.moreno.uva@gmail.com" class="btn btn-getintouch" data-i18n="contact_email">Send Email</a>
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- FULL TRANSLATIONS + SMART AUTO-DETECTION (Brazil → Portuguese) -->
+  <script>
+    const translations = {
+      "en": {
+        "title": "Leandro Moreno | Senior Bioinformatician",
+        "nav_about": "About","nav_services": "Services","nav_experience": "Experience","nav_pubs": "Publications","nav_contact": "Contact",
+        "header_h1": "LEMŌ Data Science","header_p1": "\"LEarning and MOdeling\"",
+        "header_p2": "Translational Data Science | Bioinformatics | Data Storytelling","btn_getintouch": "Get in touch",
+        "about_h2": "About me",
+        "about_p": "Hi, I'm Leandro<span class=\"wave\" role=\"img\" aria-label=\"hand waving\">👋🏽</span>&nbsp;&nbsp;I am specialized in applying <b>advanced bioinformatics</b> and data visualization techniques to analyze <b>multi omics datasets</b>. I transform complex biological data into clear, insightful patterns and interactive visualizations that help companies and researchers communicate their results effectively.",
+        "services_h2": "Services",
+        "service_analysis_title": "Custom Bioinformatics Analysis",
+        "service_analysis_desc": "Sequencing-based projects: bulk RNA-seq, scRNA-seq/atac-seq, metagenomics (16S & shotgun), WGS/WES, bisulfite-seq, ChIP-seq, long-read (PacBio/Nanopore), spatial transcriptomics, etc.",
+        "service_integration_title": "Multi-omics Integration & Data Storytelling",
+        "service_integration_desc": "Combining transcriptomics, proteomics, genomics, epigenomics and clinical data into clear biological insights and publication-ready figures.",
+        "service_consultancy_title": "Scientific Consultancy & Interactive Tools",
+        "service_consultancy_desc": "Project design, pipeline development, team training, GCP-compliant R Shiny dashboards and reproducible reports for pharma, biotech and academia.",
+        "experience_h2": "Professional Experience","btn_show_more": "Show more",
+        "exp_genmab_title": "Senior Data Scientist <span>@ Genmab</span>","exp_genmab_date": "Apr 2023 – Jul 2025 • Utrecht, NL",
+        "exp_genmab_1": "Lead scRNA-seq & bulk RNA-seq for drug development","exp_genmab_2": "Multi-omics integration (TCGA, CPTAC, TEMPUS)",
+        "exp_genmab_3": "R Shiny dashboards (GCP compliant)","exp_genmab_4": "Mentored junior bioinformaticians",
+        "exp_amc_title": "Postdoc <span>@ Amsterdam UMC</span>","exp_amc_date": "Nov 2018 – Mar 2023 • Amsterdam, NL",
+        "exp_amc_1": "scRNA-seq + GRO-seq in colorectal cancer","exp_amc_2": "Deep learning for RNA-seq deconvolution","exp_amc_3": "ML classification of metastatic subtypes",
+        "exp_uva_title": "PhD <span>@ UvA / Westerdijk Institute</span>","exp_uva_date": "Oct 2013 – Nov 2018 • Amsterdam, NL",
+        "exp_uva_1": "33 fungal genomes (PacBio + Illumina)","exp_uva_2": "Comparative transcriptomics of pathogens","exp_uva_3": "Data mining for virulence biomarkers",
+        "exp_ufpr_title": "MSc Biochemistry <span>@ UFPR</span>","exp_ufpr_date": "2011 – 2013 • Curitiba, BR",
+        "exp_ufpr_1": "Pipeline for novel microRNA discovery","exp_ufpr_2": "De novo transcriptome assembly",
+        "pubs_h2": "Selected Publications",
+        "pub_gut": "<strong>Gut 2025</strong><br><em>Schwarzmuller I.J., et al.</em>",
+        "pub_nature": "<strong>Nature 2021</strong><br><em>van Neerven S.M., et al.</em>",
+        "pub_cell": "<strong>Cell Reports Medicine 2024</strong><br><em>Bootsma S., et al.</em>",
+        "pub_natcomm": "<strong>Nature Communications 2022</strong><br><em>Lenos K.J., et al.</em>",
+        "btn_pubmed": "Full list on PubMed","based_in_h2": "Based in","contact_h2": "Contact","contact_email": "Send Email"
+      },
+      "pt-BR": {
+        "title": "Leandro Moreno | Bioinformatista Sênior",
+        "nav_about": "Sobre","nav_services": "Serviços","nav_experience": "Experiência","nav_pubs": "Publicações","nav_contact": "Contato",
+        "header_h1": "LEMŌ Data Science","header_p1": "\"LEarning and MOdeling\"",
+        "header_p2": "Ciência de Dados Translacional | Bioinformática | Data Storytelling","btn_getintouch": "Entre em contato",
+        "about_h2": "Sobre mim",
+        "about_p": "Oi, eu sou Leandro<span class=\"wave\" role=\"img\" aria-label=\"mão acenando\">👋🏽</span>&nbsp;&nbsp;Especializado em aplicar <b>bioinformática avançada</b> e técnicas de visualização de dados para analisar <b>conjuntos multi-ômicos</b>. Transformo dados biológicos complexos em padrões claros, visualizações interativas e histórias que ajudam empresas e pesquisadores a comunicar resultados de forma eficaz.",
+        "services_h2": "Serviços",
+        "service_analysis_title": "Análise de Bioinformática Personalizada",
+        "service_analysis_desc": "Projetos baseados em sequenciamento: RNA-seq bulk, scRNA-seq/atac-seq, metagenômica (16S e shotgun), WGS/WES, bisulfite-seq, ChIP-seq, leituras longas (PacBio/Nanopore), transcriptômica espacial, etc.",
+        "service_integration_title": "Integração Multi-ômica & Data Storytelling",
+        "service_integration_desc": "Combinando transcriptômica, proteômica, genômica, epigenômica e dados clínicos em insights biológicos claros e figuras prontas para publicação.",
+        "service_consultancy_title": "Consultoria Científica & Ferramentas Interativas",
+        "service_consultancy_desc": "Desenho de projetos, desenvolvimento de pipelines, treinamento de equipes, dashboards compatíveis com GCP (Good Clinical Practice) e relatórios reprodutíveis para indústria farmacêutica, biotech e academia.",
+        "experience_h2": "Experiência Profissional","btn_show_more": "Mostrar mais",
+        "exp_genmab_title": "Cientista de Dados Sênior <span>@ Genmab</span>","exp_genmab_date": "Abr 2023 – Jul 2025 • Utrecht, NL",
+        "exp_genmab_1": "Liderança em scRNA-seq & RNA-seq bulk para desenvolvimento de fármacos",
+        "exp_genmab_2": "Integração multi-ômica (TCGA, CPTAC, TEMPUS)","exp_genmab_3": "Dashboards R Shiny (compatíveis com GCP)","exp_genmab_4": "Mentoria de bioinformatas júniores",
+        "exp_amc_title": "Pós-doutorado <span>@ Amsterdam UMC</span>","exp_amc_date": "Nov 2018 – Mar 2023 • Amsterdã, NL",
+        "exp_amc_1": "scRNA-seq + GRO-seq em câncer colorretal","exp_amc_2": "Deep learning para deconvolução de RNA-seq","exp_amc_3": "Classificação por ML de subtipos metastáticos",
+        "exp_uva_title": "Doutorado <span>@ UvA / Westerdijk Institute</span>","exp_uva_date": "Out 2013 – Nov 2018 • Amsterdã, NL",
+        "exp_uva_1": "33 genomas fúngicos (PacBio + Illumina)","exp_uva_2": "Transcriptômica comparativa de patógenos","exp_uva_3": "Mineração de dados para biomarcadores de virulência",
+        "exp_ufpr_title": "Mestrado em Bioquímica <span>@ UFPR</span>","exp_ufpr_date": "2011 – 2013 • Curitiba, BR",
+        "exp_ufpr_1": "Pipeline para descoberta de novos microRNAs","exp_ufpr_2": "Montagem de transcriptoma de novo",
+        "pubs_h2": "Publicações Selecionadas",
+        "pub_gut": "<strong>Gut 2025</strong><br><em>Schwarzmuller I.J., et al.</em>",
+        "pub_nature": "<strong>Nature 2021</strong><br><em>van Neerven S.M., et al.</em>",
+        "pub_cell": "<strong>Cell Reports Medicine 2024</strong><br><em>Bootsma S., et al.</em>",
+        "pub_natcomm": "<strong>Nature Communications 2022</strong><br><em>Lenos K.J., et al.</em>",
+        "btn_pubmed": "Lista completa no PubMed","based_in_h2": "Baseado em","contact_h2": "Contato","contact_email": "Enviar Email"
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || null;
+
+    function applyLanguage() {
+      document.documentElement.lang = currentLang;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang] && translations[currentLang][key]) el.textContent = translations[currentLang][key];
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        if (translations[currentLang] && translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
+      });
+      const activeItem = document.querySelector(`.locale-item[data-lang="${currentLang}"]`);
+      if (activeItem) {
+        document.querySelector('.current-locale').textContent = activeItem.querySelector('span').textContent;
+        document.querySelectorAll('.locale-item').forEach(i => i.classList.remove('active'));
+        activeItem.classList.add('active');
+        document.querySelectorAll('.locale-item .check svg').forEach(svg => svg.parentNode.innerHTML = '');
+        activeItem.querySelector('.check').innerHTML = '<svg height="16" viewBox="0 0 16 16" width="16"><path fill="currentColor" d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path></svg>';
+      }
+    }
+
+    if (!currentLang) {
+      const browserLang = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || 'en';
+      currentLang = (browserLang === 'pt-BR' || browserLang.startsWith('pt-')) ? 'pt-BR' : 'en';
+
+      fetch('https://ipapi.co/json/')
+        .then(r => r.json())
+        .then(data => {
+          if (data && data.country_code === 'BR') currentLang = 'pt-BR';
+          applyLanguage();
+          localStorage.setItem('lang', currentLang);
+        })
+        .catch(() => {
+          applyLanguage();
+          localStorage.setItem('lang', currentLang);
+        });
+    } else {
+      applyLanguage();
+    }
+
+    document.querySelectorAll('.locale-item').forEach(item => {
+      item.addEventListener('click', function () {
+        currentLang = this.dataset.lang;
+        localStorage.setItem('lang', currentLang);
+        applyLanguage();
+        document.getElementById('locale-menu').classList.remove('show');
+        document.querySelector('.locale-trigger').setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.querySelector('.locale-trigger').addEventListener('click', function(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('locale-menu');
+      const expanded = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', !expanded);
+      menu.classList.toggle('show');
+    });
+    document.addEventListener('click', () => {
+      document.getElementById('locale-menu').classList.remove('show');
+      document.querySelector('.locale-trigger').setAttribute('aria-expanded', 'false');
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('navbar-shrink', window.scrollY > 100);
+    });
+
+    // Particles
+    particlesJS("particles-js", {
+      "particles": { "number": { "value": 85 }, "color": { "value": "#42f5e6" }, "opacity": { "value": 0.45 }, "size": { "value": 4.2, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#42f5e6", "opacity": 0.25, "width": 1.2 }, "move": { "enable": true, "speed": 1.4 } },
+      "interactivity": { "events": { "onhover": { "enable": true, "mode": "repulse" } } }
+    });
+
+    // Map with popup fix + resize fix
+    var map = L.map('map').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    var amsterdam = L.marker([52.3676, 4.9041]).addTo(map)
+        .bindPopup('<b>Amsterdam, NL</b><br>Home base', { autoClose: false, closeOnClick: false });
+    var curitiba = L.marker([-25.4284, -49.2733]).addTo(map)
+        .bindPopup('<b>Curitiba, BR</b><br>Current base', { autoClose: false, closeOnClick: false });
+
+    map.fitBounds(L.featureGroup([amsterdam, curitiba]).getBounds().pad(0.5));
+
+    setTimeout(() => {
+        amsterdam.openPopup();
+        curitiba.openPopup();
+    }, 600);
+
+    // Fix map when timeline is opened
+    $('#timeline-container').on('shown.bs.collapse', function () {
+      setTimeout(() => map.invalidateSize(), 400);
+    });
+
+    // Mobile menu auto-close
+    $('.navbar-nav>li>a').on('click', function(){
+      $('.navbar-collapse').collapse('hide');
+    });
+  </script>
+</body>
+</html>
