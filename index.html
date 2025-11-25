@@ -512,13 +512,9 @@
       const browserLang = (navigator.languages && navigator.languages[0]) || navigator.language || navigator.userLanguage || 'en';
       currentLang = (browserLang === 'pt-BR' || browserLang.startsWith('pt-')) ? 'pt-BR' : 'en';
 
-      fetch('https://ipapi.co/json/')
-        .then(r => r.json())
-        .then(data => {
-          if (data && data.country_code === 'BR') currentLang = 'pt-BR';
-          applyLanguage();
-          localStorage.setItem('lang', currentLang);
-        })
+      currentLang = /^pt/i.test(browserLang) ? 'pt-BR' : 'pt-BR';
+      localStorage.setItem('lang', currentLang);
+      applyLanguage();
         .catch(() => {
           currentLang = 'pt-BR';
           applyLanguage();
